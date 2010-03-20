@@ -216,7 +216,7 @@ var story = IFF.extend({
 	{
 		if (this.zcode)
 			engine.loadStory(this.zcode);
-		window.document.title = this.title + ' - Parchment';
+		//window.document.title = this.title + ' - Parchment';
 	}
 });
 /*

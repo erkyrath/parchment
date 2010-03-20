@@ -174,7 +174,10 @@
 
 
 function WebZui(logfunc) {
-	  var widthInChars = gIsIphone ? 38 : 80;
+	  var widthInChars = 80;
+          if (gIsIphone && $(document.body).width() <= 480) {
+              widthInChars = 38;
+          }
 
 	  this._size = [widthInChars, 25];
 	  this._console = null;
@@ -269,9 +272,11 @@ function WebZui(logfunc) {
 	      var newEvent = new Object();
 	      switch (event.keyCode) {
 	      case 127:
+              case 8:
 	        newEvent.keyCode = BACKSPACE_KEYCODE;
 	        break;
 	      case 10:
+              case 13:
 	        newEvent.keyCode = RETURN_KEYCODE;
 	        break;
 	      default:
@@ -740,8 +745,8 @@ function WebZui(logfunc) {
 	    onPrint: function(output) {
 	      var styles = self._calcFinalStyles();
 
-	      self._log("print wind: " + self._activeWindow + " output: " +
-	                output.quote() + " style: " + styles);
+	      //self._log("print wind: " + self._activeWindow + " output: " +
+	      //          output.quote() + " style: " + styles);
 
 	      if (self._activeWindow == 0) {
 	        var lines = output.split("\n");
@@ -924,7 +929,7 @@ var gThisUrl = location.protocol + "//" + location.host + location.pathname;
 var gBaseUrl = gThisUrl.slice(0, gThisUrl.lastIndexOf("/"));
 var gStory = "";
 var gZcode = null;
-var gIsIphone = navigator.userAgent.match(/iPhone/i);
+var gIsIphone = navigator.userAgent.match(/iPhone|iPod|iPad|Android/i);
 var storyName = '';
 
 var IF_ARCHIVE_PREFIX = "if-archive/";
@@ -936,12 +941,15 @@ function getFilenameFromUrl(url) {
 }
 
 $(document).ready(function() {
-  var qs = new Querystring();
-  var story = qs.get("story", "stories/troll.zblorb.js");
+  var story = window.STORYFILE;
+  if (!story) {
+      var qs = new Querystring();
+      story = qs.get("story", "stories/troll.zblorb.js");
+  }
   storyName = getFilenameFromUrl(story);
 
   storyName = storyName ? storyName + " - Parchment" : "Parchment";
-  window.document.title = storyName;
+  //window.document.title = storyName;
 
   $("#progress-text").html("Retrieving story file...");
 

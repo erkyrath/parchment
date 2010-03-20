@@ -170,6 +170,7 @@ function EngineRunner(engine, zui, logfunc) {
 
       var effect = '"' + engine.effect(0) + '"';
 
+      /*
       var logString = "[ " + engine.effect(0);
 
       for (var i = 1; engine.effect(i) != undefined; i++) {
@@ -180,6 +181,7 @@ function EngineRunner(engine, zui, logfunc) {
       }
 
       self._log(logString + " ]");
+      */
 
       switch (effect) {
       case GNUSTO_EFFECT_INPUT:
