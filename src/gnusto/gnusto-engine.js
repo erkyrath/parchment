@@ -592,7 +592,7 @@ function handleZ_ret_popped(engine, a) {
 function handleZ_catch(engine, a) {
     // The stack frame cookie is specified by Quetzal 1.3b s6.2
     // to be the number of frames on the stack.
-    return engine._storer("call_stack.length");
+    return engine._storer("m_call_stack.length");
 }
 
 function handleZ_pop(engine, a) {
@@ -4552,7 +4552,7 @@ GnustoEngine.prototype = {
   m_debug_mode: 0,
   m_parser_debugging: 0,
   // assert when any value outside 0..FFFF is written or read
-  m_value_asserts: 1,  //###
+  m_value_asserts: 0,
 
   // Hash of breakpoints. If compile() reaches one of these, it will stop
   // before executing that instruction with GNUSTO_EFFECT_BREAKPOINT, and the
