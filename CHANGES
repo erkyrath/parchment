@@ -1,16 +1,47 @@
 Change log started August 2009.
 
+April 2010
+================================================================================
+Fixed undo support, now with multi-undo support.
+
 March 2010
 ================================================================================
  + Zarf made many changes to Gnusto to remove signed data from the memory, and correct for overflows etc.
+ + Simplified file.download_to_array(). Cross origin requests are no longer made.
+ + If an array is passed to download_to_array() the second element is treated as a backup base64 file.
+ + Fixed some problems in Gnusto caused by refering to engine rather than this.
+ + The launch_zmachine() callback now runs in two stages, in case it is run prematurely.
+ + Fix page up/down support.
 
 February 2010
 ================================================================================
  - Removed jquery.mousewheel.js and associated event handlers, and switched back to normal scrolling.
+ - The uncompressed packages shouldn't be stored in git. Moved them to .build/
+ + Move FatalError.prototype.onError from web-zui.js to error-handling.js so we can display errors before web-zui.js is loaded.
+ + file.download_to_array() now uses a proxy server if it needs to.
+ + Update to jQuery 1.4.2.
  + Updated Gnusto with the fix for the illegal object number bug.
+ 
+January 2010
+================================================================================
+ + Added launch_zmachine() which launches the Z-Machine, late downloading the files it needs. (library.js)
+ + Rearranged the packages to create zmachine.js.
+ + Defer initial scripts. (parchment.html)
+ + Added a site.yaml for DryDrop.
+ + Encorporate _webZuiStartup() into launch_zmachine(). (library.js)
+ + Update to jQuery 1.4 (and then 1.4.1)!
+ + Fix the "console is not defined" error. (library.js)
+ + Use the Last-Modified/If-Modified-Since headers (except when loading from a file:). (intro.js)
+ * Moved zcode.html and zcode2js.html to tools/.
+ + Added file.support for XMLHttpRequest feature support.
+
+December 2009
+================================================================================
+ + Added file.download_to_array(), with binary support.
 
 September 2009
 ================================================================================
+ + Began working on the Library. Moved code from web-zui.js to library.js, and added intro.js and outro.js.
  + Gnusto now uses a Quetzal class, so changed the Parchment interfaces to it.
  - Removed beret.js
 
