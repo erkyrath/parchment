@@ -217,7 +217,7 @@ Library = Class.extend({
 
 		storyName = url.slice( url.lastIndexOf("/") + 1 );
 		storyName = storyName ? storyName + " - Parchment" : "Parchment";
-		window.document.title = storyName;
+		//window.document.title = storyName;
 
 		// Check the story cache first
 		if (this.stories.url[url])

@@ -7,7 +7,7 @@
  */
 (function(){
 
-window.gIsIphone = navigator.userAgent.match(/iPhone/i);
+window.gIsIphone = navigator.userAgent.match(/iPhone|iPod|iPad|Android/i);
 
 var topwin_element;
 var topwin_dist = '0';

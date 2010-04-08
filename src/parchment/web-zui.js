@@ -176,7 +176,10 @@ PAGEDOWN_KEYCODE = 34;
 
 
 function WebZui( library, engine, logfunc) {
-	  var widthInChars = gIsIphone ? 38 : 80;
+	  var widthInChars = 80;
+	  if (gIsIphone && $(document.body).width() <= 480) {
+	     widthInChars = 38;
+	  }
 
 	  this._size = [widthInChars, 25];
 	  this._console = null;
