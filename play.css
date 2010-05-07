@@ -190,24 +190,34 @@ body {
     text-decoration: blink;
 }
 
+/* A generic line input editor */
+.LineInput
+{
+	display: inline-block;
+}
+
+.LineInput input
+{
+	border: 0;
+    margin: 0px;
+    padding: 0px;
+    outline-width: 0px;
+    outline-style: none;
+    font-family: palatino, georgia, verdana, arial, sans-serif;
+    color: #070;
+    font-size: 12pt;
+}
+
 .finished-input {
     color: #070;
     font-size: 12pt;
 }
 
-.finished-input.z-fixed-pitch {
-    font-family: palatino, georgia, verdana, arial, sans-serif;
-    font-size: 12pt;
-}
-
-#current-input.z-fixed-pitch {
-    font-family: palatino, georgia, verdana, arial, sans-serif;
-    font-size: 12pt;
-}
-
-#current-input {
-    color: #070;
-    font-size: 12pt;
+/* A generic character input */
+.CharInput
+{
+	left: -99em;
+	position: absolute;
 }
 
 .z-roman {
@@ -269,15 +279,4 @@ body {
     font-size: 14pt;
     text-align: right;
     position: relative;
-}
-
-/* Hide the pastebox */
-#pastebox, #pastebox input
-{
-	background: transparent;
-	border: none;
-	position: fixed;
-	right: 0;
-	top: 0;
-	width: 1px;
 }
