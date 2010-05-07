@@ -117,8 +117,26 @@ body {
     text-decoration: blink;
 }
 
+/* A generic line input editor */
+.LineInput
+{
+	display: inline-block;
+}
+
+.LineInput input
+{
+	border: 0;
+}
+
 .finished-input {
     opacity: 0.5;
+}
+
+/* A generic character input */
+.CharInput
+{
+	left: -99em;
+	position: absolute;
 }
 
 .z-roman {
@@ -180,15 +198,4 @@ body {
     font-size: 14pt;
     text-align: right;
     position: relative;
-}
-
-/* Hide the pastebox */
-#pastebox, #pastebox input
-{
-	background: transparent;
-	border: none;
-	position: fixed;
-	right: 0;
-	top: 0;
-	width: 1px;
 }
