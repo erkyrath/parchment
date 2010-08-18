@@ -1724,7 +1724,6 @@ GnustoEngine.prototype = {
 					jscode = this.m_jit[start_pc];
       } else {
 					jscode=eval('with (this) {dummy='+this._compile()+'}');
-//					this.logger('### ' + jscode); //####
 
 					// Store it away, if it's in static memory (there's
 					// not much point caching JIT from dynamic memory!)
