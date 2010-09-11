@@ -195,7 +195,7 @@ body {
 /* A generic line input editor */
 .LineInput
 {
-	display: inline-block;
+	display: inline;
 }
 
 .LineInput input
@@ -205,7 +205,8 @@ body {
     padding: 0px;
     outline-width: 0px;
     outline-style: none;
-    font-family: palatino, georgia, verdana, arial, sans-serif;
+    font-family: inherit;
+    background: none;
     color: #070;
     font-size: 12pt;
 }
@@ -255,6 +256,3 @@ body {
     margin: 10px;
 }
 
-#progress-text {
-    font-size: 10pt;
-}
