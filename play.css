@@ -258,20 +258,3 @@ body {
 #progress-text {
     font-size: 10pt;
 }
-
-.iphone-visible {
-    opacity: 0.5;
-}
-
-.iphone-invisible {
-    opacity: 0;
-}
-
-#iphone-text-field {
-    border: none;
-    background: inherit;
-    font-family: palatino, georgia, verdana, arial, sans-serif;
-    font-size: 14pt;
-    text-align: right;
-    position: relative;
-}
