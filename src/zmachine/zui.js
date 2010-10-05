@@ -17,7 +17,7 @@ parchment.lib.ZUI = Object.subClass({
 		widthInChars = ( gIsIphone && $( document.body ).width() <= 480 ) ? 38 : 80;
 		
 		// Set up the HTML we need
-		library.container.html( '<div id="top-window" class="buffered-window"></div><div id="buffered-windows"></div><div id="content"></div><div id="bottom"></div>' );
+		library.container.html( '<div id="top-window" class="buffered-window"></div><div id="buffered-windows"></div><div id="content" role="log"></div><div id="bottom"></div>' );
 		
 		// Defaults
 		$.extend( self, {
@@ -36,6 +36,8 @@ parchment.lib.ZUI = Object.subClass({
 			
 			library: library,
 			engine: engine,
+			
+			hidden_load_indicator: 0,
 			
 			bottom: $("#bottom"),
 			current_input: $("#current-input"),
@@ -74,7 +76,8 @@ parchment.lib.ZUI = Object.subClass({
 	        self._console.close();
 	        self._console = null;
 	      }
-	      $("#content").empty();
+	      //$("#content").empty();
+	      self.onPrint("\n[ The game has finished. ]")
 	      self._unbindEventHandlers();
 	    },
 
@@ -100,6 +103,12 @@ parchment.lib.ZUI = Object.subClass({
 	    _removeBufferedWindows: function() {
 	      var windows = $("#buffered-windows > .buffered-window");
 	      windows.fadeOut("slow", function() { windows.remove(); });
+        // Hide load indicator
+        if ( !this.hidden_load_indicator )
+        {
+          this.hidden_load_indicator = 1;
+          this.library.load_indicator.detach();
+        }
 	      // A more conservative alternative to the above is:
 	      // $("#buffered-windows").empty();
 	    },
@@ -136,7 +145,14 @@ parchment.lib.ZUI = Object.subClass({
 	        self._reverseVideo = oldrev;
 	        self._activeWindow = oldwin;
           }
-
+          
+          // Hide load indicator
+          if ( !self.hidden_load_indicator )
+          {
+          	self.hidden_load_indicator = 1;
+          	self.library.load_indicator.detach();
+          }
+          
    	      self._currentCallback = callback;
 	      /*$("#content").append(
 	        '<span id="current-input"><span id="cursor">_</span></span>'
@@ -149,6 +165,14 @@ parchment.lib.ZUI = Object.subClass({
 	    onCharacterInput: function(callback) {
 	    	var self = this;
 	      self._currentCallback = callback;
+	      
+	      // Hide load indicator
+          if ( !self.hidden_load_indicator )
+          {
+          	self.hidden_load_indicator = 1;
+          	self.library.load_indicator.detach();
+          }
+          
 	      self.text_input.getChar( callback );
 	    },
 
