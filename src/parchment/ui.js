@@ -10,22 +10,28 @@
 var window = this,
 
 // Wrap document
-doc = $( document );
+doc = $( document ),
+
+// Cached regexs
+rmobileua = /iPhone|iPod|iPad|Android/i,
+rnotwhite = /\S/,
 
 // window.scrollByPages() compatibility
-if ( !window.scrollByPages )
+scrollByPages = window.scrollByPages || function( pages )
 {
-	window.scrollByPages = function( pages )
-	{
-		// From Mozilla's nsGfxScrollFrame.cpp
-		// delta = viewportHeight - Min( 10%, lineHeight * 2 )
-		var height = doc[0].documentElement.clientHeight,
-		delta = height - Math.min( height / 10, parseInt( $( 'body' ).css( 'line-height' ) ) * 2 );
-		scrollBy( 0, delta * pages );
-	};
-}
+	// From Mozilla's nsGfxScrollFrame.cpp
+	// delta = viewportHeight - Min( 10%, lineHeight * 2 )
+	var height = doc[0].documentElement.clientHeight,
+	delta = height - Math.min( height / 10, parseInt( $( 'body' ).css( 'line-height' ) ) * 2 );
+	scrollBy( 0, delta * pages );
+},
 
-window.gIsIphone = navigator.userAgent.match(/iPhone|iPod|iPad|Android/i);
+// getSelection compatibility-ish. We only care about the text value of a selection
+selection = window.getSelection ||
+	( document.selection && function() { return document.selection.createRange().text; } ) ||
+	function() { return ''; };
+
+window.gIsIphone = rmobileua.test( navigator.userAgent );
 
 // Make the statusline always move to the top of the screen in MSIE < 7
 if ( $.browser.msie && parseInt($.browser.version) < 7 )
@@ -86,18 +92,22 @@ parchment.lib.TextInput = Object.subClass({
 		
 		// The line input element
 		lineInput = $( '<input>', {
+			autocapitalize: 'off',
 			keydown: function( event )
 			{
-				var keyCode = event.which;
+				var keyCode = event.which,
+				cancel;
 				
 				// Check for up/down to use the command history
 				if ( keyCode == 38 ) // up -> prev
 				{
 					self.prev_next( 1 );
+					cancel = 1;
 				}
 				if ( keyCode == 40 ) // down -> next
 				{
 					self.prev_next( -1 );
+					cancel = 1;
 				}
 				
 				// Trigger page up/down on the body
@@ -105,10 +115,19 @@ parchment.lib.TextInput = Object.subClass({
 				if ( keyCode == 33 ) // Up
 				{
 					scrollByPages(-1);
+					cancel = 1;
 				}
 				if ( keyCode == 34 ) // Down
 				{
 					scrollByPages(1);
+					cancel = 1;
+				}
+				
+				// Don't do the default browser action
+				// (For example in Mac OS pressing up will force the cursor to the beginning of a line)
+				if ( cancel )
+				{
+					return false;
 				}
 			}
 		}),
@@ -146,13 +165,17 @@ parchment.lib.TextInput = Object.subClass({
 		// Focus clicks in the container (only)
 		// To focus document clicks use UI.addTextInput()
 		container.bind( 'click.TextInput', function() {
-			if ( $( '.LineInput' ).length )
+			// Don't do anything if the user is selecting some text
+			if ( selection() == '' )
 			{
-				lineInput.focus();
-			}
-			if ( $( '.CharInput' ).length )
-			{
-				charInput.focus();
+				if ( $( '.LineInput' ).length )
+				{
+					lineInput.focus();
+				}
+				if ( $( '.CharInput' ).length )
+				{
+					charInput.focus();
+				}
 			}
 		});
 		
@@ -216,7 +239,7 @@ parchment.lib.TextInput = Object.subClass({
 			.appendTo( self.stream.children().last() );
 		
 		// Add this command to the history, as long as it's not the same as the last, and not blank
-		if ( command != self.history[0] && /\S/.test( command ) )
+		if ( command != self.history[0] && rnotwhite.test( command ) )
 		{
 			self.history.unshift( command );
 		}
