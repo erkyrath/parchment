@@ -1,0 +1,44 @@
+body {
+  -webkit-text-size-adjust: none;
+  font-family: palatino, georgia, verdana, arial, sans-serif;
+  font-size: 11pt;
+  line-height: 14pt;
+}
+
+#column {
+  position: relative;
+  width: 600px;
+  height: 100%;
+  margin: auto;
+}
+
+#about {
+  color: gray;
+  margin-top: 16pt;
+  font-size: 16pt;
+}
+
+.TextGrid {
+  font-family: monaco, andale mono, lucidatypewriter, courier, courier new, monospace;
+  font-size: 10pt;
+  color: white;
+  background-color: black;
+}
+
+tt {
+  font-family: inherit;
+  line-height: inherit;
+}
+
+.TextInput {
+  margin: 0px;
+  color: green;
+}
+
+.FinishedInput {
+  color: green;
+}
+
+@media screen and (max-device-width: 480px) {
+  width: 320px;
+}
