@@ -35,7 +35,7 @@ parchment.vms.gnusto = {
 		
 		// Load it up!
 		window.engine = new GnustoEngine( window.console && function() { console.log( msg ); } || function(){} );
-		window.runner = new GnustoRunner( engine, new StructIO( parchment.options.container ), mystory.zcode );
+		window.runner = new GnustoRunner( engine, new StructIO( parchment.options.container , parchment.options.scrollparent ), mystory.zcode );
 		
 		/* savefile = location.hash
 		if ( savefile && savefile != '#' ) // IE will set location.hash for an empty fragment, FF won't

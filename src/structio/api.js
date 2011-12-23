@@ -80,13 +80,13 @@ var basic_stream_handler = function( e )
 // .input() must be set by whatever uses StructIO
 window.StructIO = Object.subClass({
 	
-	init: function( element )
+	init: function( element, scrollparent )
 	{
 		element = $( element );
 		this.container = element
 		this.target = element;
 		element.bind( 'stream', basic_stream_handler );
-		this.TextInput = new TextInput( this.container );
+		this.TextInput = new TextInput( this.container, scrollparent );
 		// Default structures
 		this.structures = {
 			main: {
