@@ -99,7 +99,8 @@ window.StructIO = Object.subClass({
 		};
 		
 		// Calculate the width we want
-		var charwidthelem = $( '<tt>00000</tt>' )
+		// ZARF: Specify class="TextGrid" for the test text
+		var charwidthelem = $( '<tt class="TextGrid">00000</tt>' )
 			.appendTo( element ),
 		charwidth = charwidthelem.width() / 5,
 		widthinchars = Math.min( Math.floor( element.width() / charwidth ), 80 );

@@ -203,7 +203,13 @@ var GnustoRunner = Object.subClass({
 		// Handle line input
 		if ( code == 'read' )
 		{
-			this.ui.buffer += data.response + '\n';
+                	// ZARF: put class="FinishedInput" on the input line
+                	//this.ui.buffer += data.response + '\n';
+			this.io.event([{
+				code: 'stream',
+                                name: 'FinishedInput',
+				text: data.response + '\n'
+			}]);
 			engine.answer( 0, data.terminator );
 			engine.answer( 1, data.response );
 		}
