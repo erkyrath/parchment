@@ -1,21 +1,41 @@
-body {
+html {
   -webkit-text-size-adjust: none;
+  overflow: hidden;
+}
+
+body {
   font-family: palatino, georgia, verdana, arial, sans-serif;
   font-size: 11pt;
   line-height: 14pt;
 }
 
 #column {
+  position: absolute;
+  top: 80px;
+  bottom: 0px;
+  width: 100%;
+}
+
+#subcolumn {
   position: relative;
-  width: 600px;
   height: 100%;
-  margin: auto;
+  width: 600px;
+  margin: 0px auto;
 }
 
 #about {
   color: gray;
   margin-top: 16pt;
   font-size: 16pt;
+}
+
+#parchment {
+  position: absolute;
+  width: 100%;
+  top: 0px;
+  bottom: 0px;
+  overflow: scroll;   /* vertical scrollbar is mandatory */
+  overflow-x: hidden; /* but horizontal scrollbar is forbidden */
 }
 
 .TextGrid {
@@ -40,5 +60,7 @@ tt {
 }
 
 @media screen and (max-device-width: 480px) {
-  width: 320px;
+  #subcolumn {
+    width: 320px;
+  }
 }
