@@ -52,6 +52,7 @@ tt {
 
 .TextInput {
   margin: 0px;
+  margin-bottom: 1em;
   color: green;
 }
 
