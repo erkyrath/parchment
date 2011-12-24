@@ -1,0 +1,41 @@
+Change log started July 2009.
+
+November 2010
+================================================================================
+Fixed some ZSCII/ASCII conversion errors, thanks for spotting Zarf.
+Added support for @parchment and its raw eval() mode function.
+
+August 2010
+================================================================================
+Complies with the Z-Machine 1.1 updates/clarifications.
+Added support for the Z-Machine 1.2 @gestalt opcode (but disabled until full 1.1 support has been added.)
+
+April 2010
+================================================================================
+Fixed undo support, now with multi-undo support.
+Fixed ge_ascii_char_to_zscii() for Enter and arrow keys.
+
+March 2010
+================================================================================
+ + Zarf made many changes to remove signed data from the memory, and correct for overflows etc.
+ + Fix a typo in @catch.
+ + Fixed many references to the variable engine which should have been referencing this.
+ + Made a Gnusto Bootstrap script, and used it for a Praxix test page (gnusto-bootstrap.js, praxix.html).
+
+February 2010
+================================================================================
+ + Fixed an overflow bug in handleZ_sub() which had been causing the illegal object number bug.
+ 
+September 2009
+================================================================================
+ + Added IFF.write()
+ + Added a Quetzal class.
+ + ge_saveGame() now uses the Quetzal class.
+ + ge_loadSavedGame() uses the Quetzal class too.
+
+July 2009
+================================================================================
+ + Set the Z Machine Spec version header
+ + The optimised storew opcode would not correctly account for negative addresses.
+ + Inlined the ge_varcode_set() call in ge_func_return()
+ + Inlined calls to getWord() in handleZ_loadw() and ge_get_prop()

@@ -1,5 +1,41 @@
 Change log started August 2009.
 
+November 2011
+================================================================================
+ZVM is now the default Z-Machine VM.
+Changed the VM launching system so that each VM now provides a Runner (or else it will use the default).
+Gnusto uses ZVM's UI class. The old ZUI is gone!
+Wrote a new IO system called StructIO, which is used by both ZVM and Gnusto. Eventually I hope to make a Glk wrapper for it too.
+
+October 2011
+================================================================================
+Added the ifvms.js ZVM engine.
+
+May 2011
+================================================================================
+Added parchment.options.width to specify the width in characters.
+Allow options to be overriden with query string ?options=
+Rewrote the scroll-to-top-of-response code to work in iframes.
+
+April 2011
+================================================================================
+Smallish changes to the text input class.
+Support responseBody in IE.
+
+March 2011
+================================================================================
+Added Quixe! :D
+Minor changes to allow the Quixe files to be loaded in any order.
+
+February 2011
+================================================================================
+Fixed issue 155: insert extra spans so that input works even if no prompt printed.
+Upgraded to jQuery 1.5. The git version was needed as they broke file:. Gah.
+Used the awesome new 1.5 features to add a custom binary dataType.
+Used jQuery.when() to rewrite the launcher, which is now extensible.
+Get stuff ready for iplayif.com... scrap querystring.js.
+Added a very basic search page.
+
 October 2010
 ================================================================================
 Set more header variables.

@@ -1,0 +1,66 @@
+/* 
+
+StructIO styles
+===============
+
+Copyright (c) 2008-2011 The Parchment Contributors
+BSD licenced
+http://code.google.com/p/parchment
+
+*/
+
+/* Line input */
+.TextInput
+{
+	background: none;
+	border: 0;
+	color: inherit;
+	display: inline;
+	font: inherit;
+	outline: 0;
+	padding: 0;
+}
+
+/* Character input (to be added to the above) */
+.CharInput
+{
+	left: -999em;
+	position: absolute;
+}
+
+/* Text grid window */
+.TextGrid
+{
+	position: fixed;
+	white-space: pre;
+	z-index: 2;
+}
+
+/* Floating boxes */
+.box
+{
+	position: absolute;
+	white-space: pre;
+	z-index: 1;
+}
+
+/* Main window */
+.main, .TextGrid
+{
+	/* Extra padding in case some serifs stick outside the status window */
+	padding: 0 1px;
+}
+
+/* Monospace text */
+tt
+{
+	font-family: monospace;
+	line-height: 1;
+}
+
+/* Ensure that spaces are both displayed correctly, and will also wrap */
+tt .space
+{
+	display: inline-block;
+	white-space: pre;
+}

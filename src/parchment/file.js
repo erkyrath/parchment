@@ -1,15 +1,63 @@
-// -*- tab-width: 4; -*-
 /*
  * File functions and classes
  *
- * Copyright (c) 2003-2010 The Parchment Contributors
- * Licenced under the GPL v2
+ * Copyright (c) 2008-2011 The Parchment Contributors
+ * Licenced under the BSD
  * http://code.google.com/p/parchment
  */
+
+/*
+
+TODO:
+	Consider whether it's worth having cross domain requests to things other than the proxy
+	
+	Add transport for XDR
+	
+	Access buffer if possible (don't change encodings)
+	
+	Is the native base64_decode function still useful?
+	If such a time comes when everyone has native atob(), then always expose the decoded text in process_binary_XHR()
+	
+	If we know we have a string which is latin1 (say from atob()), would it be faster to have a separate text_to_array() that doesn't need to &0xFF?
+	
+	Consider combining the eNs together first, then shifting to get the cNs (for the base64 decoder)
+
+*/
+ 
 (function(window, $){
 
+// VBScript code
+if ( window.execScript )
+{
+	execScript(
+		
+		// Idea from http://stackoverflow.com/questions/1919972/#3050364
+		
+		// Convert a byte array (xhr.responseBody) into a 16-bit characters string
+		// Javascript code will separate the characters back into 8-bit numbers again
+		'Function VBCStr(x)\n' +
+			'VBCStr=CStr(x)\n' +
+		'End Function\n' +
+		
+		// If the byte array has an odd length, this function is needed to get the last byte
+		'Function VBLastAsc(x)\n' +
+			'Dim l\n' +
+			'l=LenB(x)\n' +
+			'If l mod 2 Then\n' +
+				'VBLastAsc=AscB(MidB(x,l,1))\n' +
+			'Else\n' +
+				'VBLastAsc=-1\n' +
+			'End If\n' +
+		'End Function'
+	
+	, 'VBScript' );
+}
+
+var chrome = /chrome\/(\d+)/i.exec( navigator.userAgent ),
+chrome_no_file = chrome && parseInt( chrome[1] ) > 4,
+
 // Text to byte array and vice versa
-function text_to_array(text, array)
+text_to_array = function(text, array)
 {
 	var array = array || [], i = 0, l;
 	for (l = text.length % 8; i < l; ++i)
@@ -20,298 +68,259 @@ function text_to_array(text, array)
 		array.push(text.charCodeAt(i++) & 0xff, text.charCodeAt(i++) & 0xff, text.charCodeAt(i++) & 0xff, text.charCodeAt(i++) & 0xff,
 			text.charCodeAt(i++) & 0xff, text.charCodeAt(i++) & 0xff, text.charCodeAt(i++) & 0xff, text.charCodeAt(i++) & 0xff);
 	return array;
-}
+},
 
-function array_to_text(array, text)
+array_to_text = function(array, text)
 {
-	var text = text || '', i = 0, l, fromCharCode = String.fromCharCode;;
-	for (l = array.length % 8; i < l; ++i)
-		text += fromCharCode(array[i]);
-	for (l = array.length; i < l;)
-		text += (fromCharCode(array[i++]) + fromCharCode(array[i++]) +
-		fromCharCode(array[i++]) + fromCharCode(array[i++]) +
-		fromCharCode(array[i++]) + fromCharCode(array[i++]) +
-		fromCharCode(array[i++]) + fromCharCode(array[i++]));
-	return text;
-}
+	// String.fromCharCode can be given an array of numbers if we call apply on it!
+	return ( text || '' ) + String.fromCharCode.apply( 1, array );
+},
 
 // Base64 encoding and decoding
 // Use the native base64 functions if available
-if (window.atob)
+
+// Run this little function to build the decoder array
+encoder = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
+decoder = (function()
 {
-	var base64_decode = function(data, out)
-	{
-		return text_to_array(atob(data), out);
-	},
+	var out = [], i = 0;
+	for (; i < encoder.length; i++)
+		out[encoder.charAt(i)] = i;
+	return out;
+})(),
 
-	base64_encode = function(data, out)
-	{
-		return btoa(array_to_text(data, out));
-	};
-}
-
-// Unfortunately we will have to use pure Javascript functions
-// TODO: Consider combining the eNs together first, then shifting to get the cNs (for the decoder)
-else
+base64_decode = function(data, out)
 {
-	var encoder = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
-	// Run this little function to build the decoder array
-	decoder = (function()
+	if ( window.atob )
 	{
-		var out = [], i = 0;
-		for (; i < encoder.length; i++)
-			out[encoder.charAt(i)] = i;
-		return out;
-	})(),
-
-	base64_decode = function(data, out)
+		return text_to_array( atob( data ), out );
+	}
+	
+	var out = out || [],
+	c1, c2, c3, e1, e2, e3, e4,
+	i = 0, l = data.length;
+	while (i < l)
 	{
-	    var out = out || [],
-	    c1, c2, c3, e1, e2, e3, e4,
-	    i = 0, l = data.length;
-	    while (i < l)
-	    {
-	        e1 = decoder[data.charAt(i++)];
-	        e2 = decoder[data.charAt(i++)];
-	        e3 = decoder[data.charAt(i++)];
-	        e4 = decoder[data.charAt(i++)];
-	        c1 = (e1 << 2) + (e2 >> 4);
-	        c2 = ((e2 & 15) << 4) + (e3 >> 2);
-	        c3 = ((e3 & 3) << 6) + e4;
-	        out.push(c1, c2, c3);
-	    }
-	    if (e4 == 64)
-	        out.pop();
-	    if (e3 == 64)
-	        out.pop();
-	    return out;
-	},
+		e1 = decoder[data.charAt(i++)];
+		e2 = decoder[data.charAt(i++)];
+		e3 = decoder[data.charAt(i++)];
+		e4 = decoder[data.charAt(i++)];
+		c1 = (e1 << 2) + (e2 >> 4);
+		c2 = ((e2 & 15) << 4) + (e3 >> 2);
+		c3 = ((e3 & 3) << 6) + e4;
+		out.push(c1, c2, c3);
+	}
+	if (e4 == 64)
+		out.pop();
+	if (e3 == 64)
+		out.pop();
+	return out;
+},
 
-	base64_encode = function(data, out)
+base64_encode = function(data, out)
+{
+	if ( window.btoa )
 	{
-	    var out = out || '',
-	    c1, c2, c3, e1, e2, e3, e4,
-	    i = 0, l = data.length;
-		while (i < l)
-		{
-			c1 = data[i++];
-			c2 = data[i++];
-			c3 = data[i++];
-			e1 = c1 >> 2;
-			e2 = ((c1 & 3) << 4) + (c2 >> 4);
-			e3 = ((c2 & 15) << 2) + (c3 >> 6);
-			e4 = c3 & 63;
+		return btoa( array_to_text( data, out ) );
+	}
+	
+	var out = out || '',
+	c1, c2, c3, e1, e2, e3, e4,
+	i = 0, l = data.length;
+	while (i < l)
+	{
+		c1 = data[i++];
+		c2 = data[i++];
+		c3 = data[i++];
+		e1 = c1 >> 2;
+		e2 = ((c1 & 3) << 4) + (c2 >> 4);
+		e3 = ((c2 & 15) << 2) + (c3 >> 6);
+		e4 = c3 & 63;
 
-			// Consider other string concatenation methods?
-			out += (encoder.charAt(e1) + encoder.charAt(e2) + encoder.charAt(e3) + encoder.charAt(e4));
-		}
-		if (isNaN(c2))
-			out = out.slice(0, -2) + '==';
-		else if (isNaN(c3))
-			out = out.slice(0, -1) + '=';
-		return out;
-	};
-}
+		// Consider other string concatenation methods?
+		out += (encoder.charAt(e1) + encoder.charAt(e2) + encoder.charAt(e3) + encoder.charAt(e4));
+	}
+	if (isNaN(c2))
+		out = out.slice(0, -2) + '==';
+	else if (isNaN(c3))
+		out = out.slice(0, -1) + '=';
+	return out;
+},
+
+// Convert IE's byte array to an array we can use
+bytearray_to_array = function( bytearray )
+{
+	// VBCStr will convert the byte array into a string, with two bytes combined into one character
+	var text = VBCStr( bytearray ),
+	// VBLastAsc will return the last character, if the string is of odd length
+	last = VBLastAsc( bytearray ),
+	result = [],
+	i = 0,
+	l = text.length % 4,
+	thischar;
+	
+	while ( i < l )
+	{
+		result.push(
+			( thischar = text.charCodeAt(i++) ) & 0xff, thischar >> 8
+		);
+	}
+	
+	l = text.length;
+	while ( i < l )
+	{
+		result.push(
+			( thischar = text.charCodeAt(i++) ) & 0xff, thischar >> 8,
+			( thischar = text.charCodeAt(i++) ) & 0xff, thischar >> 8,
+			( thischar = text.charCodeAt(i++) ) & 0xff, thischar >> 8,
+			( thischar = text.charCodeAt(i++) ) & 0xff, thischar >> 8
+		);
+	}
+	
+	if ( last > -1 )
+	{
+		result.push( last );
+	}
+	
+	return result;
+},
 
 // XMLHttpRequest feature support
-var xhr = jQuery.ajaxSettings.xhr(),
+xhr = jQuery.ajaxSettings.xhr(),
 support = {
 	// Unfortunately in Opera < 10.5 overrideMimeType() doesn't work
-	binary: xhr.overrideMimeType !== undefined && !( $.browser.opera && parseFloat( $.browser.version ) < 10.5 ),
-	cross_origin: xhr.withCredentials !== undefined
-};
+	binary:
+		xhr.overrideMimeType && !( $.browser.opera && parseFloat( $.browser.version ) < 10.5 ) ? 'charset' :
+		'responseBody' in xhr ? 'responseBody' :
+		0
+},
 
-// Clean-up
-xhr = null;
-
-// Download a file to a byte array
-function download_to_array( url, callback )
+// Process a binary XHR
+process_binary_XHR = function( data, textStatus, jqXHR )
 {
-	// URL regexp
-	var urldomain = /^(file:|(\w+:)?\/\/[^\/?#]+)/,
+	var array, buffer, text;
 	
-	// If url is an array we are being given a binary and a backup 'JSONP' file
-	backup_url;
-	if ( $.isArray( url ) )
+	data = $.trim( data );
+	
+	// Decode base64
+	if ( jqXHR.mode == 'base64' )
 	{
-		backup_url = url[1];
-		url = url[0];
-	}
-	
-	// Test the page and data URLs
-	var page_domain = urldomain.exec(location)[0],
-	data_exec = urldomain.exec(url),
-	data_domain = data_exec ? data_exec[0] : page_domain,
-	
-	// Chrome > 4 doesn't allow file: to file: XHR
-	// It should however work for the rest of the world, so we have to test here, rather than when first checking for binary support
-	chrome = /chrome\/(.)/i.exec( navigator.userAgent ),
-	binary = data_domain === "file:" && chrome && parseInt( chrome[1] ) > 4 ? 0 : support.binary,
-	
-	options,
-	
-	// Utility function to download a legacy/backup file
-	download_legacy = function( url )
-	{
-		window['processBase64Zcode'] = function( data )
+		// Expose the decoded text if we have native decoding
+		if ( window.atob )
 		{
-			callback( base64_decode( data ));
-			window.processBase64Zcode = null;
-			try { delete window.processBase64Zcode; } catch(e) {}
-		};
-		$.getScript( url );
-	};
-
-	// What are we trying to download here?
-	/*
-		Page	Data	Binary	Backup	#	Action
-		http	file					1	Fail
-		file	file	0		0		2	Fail
-			legacy						3	Load legacy file
-			same		1				4	Load directly
-						0		1		5	Load JSONP backup file directly
-										6	Load from proxy (base64 + JSONP)
-	*/
-
-	// Case #3: Load legacy file
-	if ( url.slice(-3).toLowerCase() == '.js' )
-	{
-		download_legacy( url );
-		return;
-	}
-
-	// Case #1: file: loaded from http:
-	// Case #2: file: with neither binary support nor a backup encoded file
-	if ( data_domain == 'file:' && ( page_domain != data_domain || ( !binary && !backup_url ) ) )
-	{
-		throw "Can't load local files with this browser, sorry!";
-	}
-
-	// Case #4: Local file with binary support
-	if ( binary && page_domain == data_domain )
-	{
-		options = {
-			beforeSend: function ( XMLHttpRequest )
-			{
-				XMLHttpRequest.overrideMimeType('text/plain; charset=x-user-defined');
-			},
-			success: function ( data )
-			{
-				// Check to see if this could actually be base64 encoded?
-				callback( text_to_array( $.trim( data )));
-			},
-			url: url
-		};
-	}
-	
-	// Cases #5/6: No binary support
-	else
-	{
-		// Case #5: Load 'JSONP' backup file
-		if ( backup_url )
-		{
-			download_legacy( backup_url );
-			return;
-		}	
-
-		// Case #6: Load from proxy (base64 + JSONP)
-		options = {
-			data: {
-				encode: 'base64',
-				url: url
-			},
-			dataType: 'jsonp',
-			success: function ( data )
-			{
-				callback( base64_decode( $.trim( data )));
-			},
-			url: parchment.options.proxy_url
-		};
-	}
-	
-	// What are we trying to download here?
-	// Old list... will leave here for now, until we add cross origin requests again
-	/*
-		Parchment	Data	Binary	XSS	#	Action
-					file	0			1	Fail
-		http		file				2	Fail
-		legacy							3	Load legacy file
-		file		file	1			4	Load directly
-			same http		1			5	Load directly
-			diff http		1		1	6	Attempt to load directly, fall back to raw proxy if needed
-					http	0		1	7	Load base64 from proxy
-					http	0		0	8	Load base64 from JSONP proxy
-			diff http		1		0	9	Load base64 from JSONP proxy (uses base64 as the escaping required would be bigger still)
-											TODO: investigate options.scriptCharset so #9 can load raw
-	*/
-
-/*
-	// Case #1: file: but no binary support: Fail.
-	// Case #2: file: loaded from http:
-	if ( data_domain == 'file:' && ( !support.binary || page_domain != data_domain ) )
-	{
-		throw "Can't load local files with this browser, sorry!";
-	}
-
-	// Case 3: legacy support
-
-	// Case #4/5: local file with binary support or
-	// Case #6: non-local file with binary and cross origin support: Load directly
-	else if ( support.binary && ( page_domain == data_domain || support.cross_origin ) )
-	{
-		options.beforeSend = function ( XMLHttpRequest )
-		{
-			XMLHttpRequest.overrideMimeType('text/plain; charset=x-user-defined');
-		};
-		options.success = function ( data )
-		{
-			// Check to see if this could actually be base64 encoded?
-			callback( text_to_array( data ));
-		};
-		
-		// Case 6: non-local file, with cross origin support
-		if ( support.cross_origin && page_domain != data_domain )
-		{
-			// Do the magic
+			text = atob( data );
+			array = text_to_array( text );
 		}
-	}
-	
-	// Case #7: no binary but cross origin support or
-	// Case #8/9: cross origin support needed but unavailable: use the proxy server with base64 encoding
-	else
-	{
-		options.data.url = url;
-		options.url = parchment.options.proxy_url;
-		options.success = function ( data )
-		{
-			callback( base64_decode( data ));
-		};
-		
-		// Case #8/9: No cross origin support, so use JSONP (kind of... just use an extra callback function really)
-		// See note above for why case #9 uses base64 encoding
-		if ( !support.cross_origin )
-		{
-			options.dataType = "jsonp";
-		}
-		
-		// Case 7: Explictly request base64
 		else
 		{
-			options.data.encode = 'base64';
+			array = base64_decode( data );
 		}
 	}
-*/
 	
-	// Log the options for debugging
-	;;; if ( window.console && console.log ) console.log( '$.ajax() options from download_to_array(): ', options );
-	
-	// Get the file
-	options.error = function ( XMLHttpRequest, textStatus )
+	// Binary support through charset=x-user-defined
+	else if ( jqXHR.mode == 'charset' )
 	{
-		throw new FatalError('Error loading story: ' + textStatus);
+		array = text_to_array( data );
+	}
+	
+	// Access responseBody
+	else
+	{
+		array = bytearray_to_array( jqXHR.xhr.responseBody );
+	}
+	
+	jqXHR.responseArray = array;
+	jqXHR.responseText = text;
+};
+
+// Clean-up the temp XHR used above
+xhr = undefined;
+
+// Prefilters for binary ajax
+$.ajaxPrefilter( 'binary', function( options, originalOptions, jqXHR )
+{
+	// Chrome > 4 doesn't allow file:// to file:// XHR
+	// It should however work for the rest of the world, so we have to test here, rather than when first checking for binary support
+	var binary = options.isLocal && !options.crossDomain && chrome_no_file ? 0 : support.binary,
+	
+	// Expose the real XHR object onto the jqXHR
+	XHRFactory = options.xhr;
+	options.xhr = function()
+	{
+		return jqXHR.xhr = XHRFactory.apply( options );
 	};
-	$.ajax(options);
+	
+	// Set up the options and jqXHR
+	options.binary = binary;
+	jqXHR.done( process_binary_XHR );
+	
+	// Options for jsonp, which may not be used if we redirect to 'text'
+	options.jsonp = false;
+	options.jsonpCallback = 'processBase64Zcode';
+	jqXHR.mode = 'base64';
+	
+	// Load a legacy file
+	if ( options.url.slice( -3 ).toLowerCase() == '.js' )
+	{
+		return 'jsonp';
+	}
+	
+	// Binary support and same domain: use a normal text handler
+	// Encoding stuff is done in the text prefilter below
+	if ( binary && !options.crossDomain )
+	{
+		return 'text';
+	}
+	
+	// Use a backup legacy file if provided
+	if ( options.legacy )
+	{
+		options.url = options.legacy;
+		return 'jsonp';
+	}
+	
+	// Use the proxy when no binary support || cross domain request
+	options.data = 'url=' + options.url;
+	options.url = parchment.options.proxy_url;
+	
+	if ( binary && $.support.cors )
+	{
+		return 'text';
+	}
+	
+	options.data += '&encode=base64&callback=pproxy';
+	options.jsonpCallback = 'pproxy';
+	return 'jsonp';
+});
+
+// Set options for binary requests
+$.ajaxPrefilter( 'text', function( options, originalOptions, jqXHR )
+{
+	jqXHR.mode = options.binary;
+	
+	if ( jqXHR.mode == 'charset' )
+	{
+		options.mimeType = 'text/plain; charset=x-user-defined';
+	}
+});
+
+// Converters are set in intro.js
+
+/* DEBUG */
+
+// Download a file to a byte array
+// Note: no longer used by library.js
+function download_to_array( url, callback )
+{
+	// Request the file with the binary type
+	$.ajax( url, { dataType: 'binary' } )
+		.success(function( data, textStatus, jqXHR )
+		{
+			callback( jqXHR.responseArray );
+		});
 }
+
+/* ENDDEBUG */
 
 /*
 	// Images made from byte arrays
@@ -344,8 +353,8 @@ window.file = {
 	array_to_text: array_to_text,
 	base64_decode: base64_decode,
 	base64_encode: base64_encode,
-	download_to_array: download_to_array,
 	support: support
 };
+;;; window.file.download_to_array = download_to_array;
 
 })(window, jQuery);
