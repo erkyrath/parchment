@@ -75,7 +75,8 @@ StructIO = Object.subClass({
 		var element = $( env.container ),
 		
 		// Calculate the width we want
-		measureelem = $( '<tt>00000</tt>' )
+		// ZARF: Specify class="TextGrid" for the test text
+		measureelem = $( '<tt class="TextGrid">00000</tt>' )
 			.appendTo( element ),
 		charheight = measureelem.height(),
 		charwidth = measureelem.width() / 5,
