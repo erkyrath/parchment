@@ -27,6 +27,23 @@ includes = (
 		'src/parchment/gnusto.js',
 		'src/parchment/outro.js',
 	)),
+	('.build/parchmento.js', (
+		'src/lib/class.js',
+		'src/lib/iff.js',
+		'src/structio/intro.js',
+		'src/structio/input.js',
+		'src/structio/textgrid.js',
+		'src/structio/api.js',
+		'src/structio/outro.js',
+		'src/structio/runner.js',
+		'src/parchment/intro.js',
+		'src/parchment/error-handling.js',
+		'src/parchment/file.js',
+		'src/parchment/ui.js',
+		'src/parchment/library.js',
+		'src/parchment/gnusto.js',
+		'src/parchment/outro.js',
+	)),
 	('.build/parchment.css', (
 		'src/parchment/parchment.css',
 		'src/structio/structio.css',
@@ -78,6 +95,7 @@ debugzvm = re.compile('(/\*\s*GVM\s*\*/[\s\S]+?/\*\s*ENDGVM\s*\*/)|(/\* ZVM \*/\
 # List of files to compress (with debug code removed)
 compress = (
 	('.build/parchment.js', 'lib/parchment.min.js', 'src/parchment/header.txt'),
+	('.build/parchmento.js', 'lib/parchmento.min.js', 'src/parchment/header.txt'),
 	('.build/parchment.css', 'lib/parchment.min.css', 'src/parchment/header.txt'),
 	('.build/gnusto.js', 'lib/gnusto.min.js', 'src/gnusto/header.txt'),
 	('.build/quixe.js', 'lib/quixe.min.js', 'src/quixe/quixe/header.txt'),
