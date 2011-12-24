@@ -41,7 +41,8 @@ selection = window.getSelection ||
 TextInput = Object.subClass({
 	// Set up the text inputs with a container
 	// container is the greatest domain for which this instance should control input
-	init: function( container )
+	// ZARF: scrollparent, if supplied, is the element which should be scrolled as the story window.
+	init: function( container, scrollparent )
 	{
 		var self = this,
 		
@@ -160,7 +161,10 @@ TextInput = Object.subClass({
 		
 		// Find the element which we calculate scroll offsets from
 		// For now just decide by browser
-		self.scrollParent = $.browser.webkit ? $body : $( 'html' );
+		if (scrollparent)
+			self.scrollParent = $(scrollparent);
+		else
+			self.scrollParent = $.browser.webkit ? $body : $( 'html' );
 	},
 	
 	// Cleanup so we can deconstruct

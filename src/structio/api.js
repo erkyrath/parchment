@@ -96,7 +96,8 @@ StructIO = Object.subClass({
 		this.container = element
 		this.target = element;
 		element.on( 'stream', basic_stream_handler );
-		this.TextInput = new TextInput( element );
+		// ZARF: pass the scrollparent element name, if provided
+		this.TextInput = new TextInput( element, env.scrollparent );
 		
 		// Default structures
 		this.structures = {
