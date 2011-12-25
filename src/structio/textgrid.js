@@ -22,14 +22,17 @@ var TextGrid = Object.subClass({
 	init: function( elem, io )
 	{
 		var self = this;
+		// ZARF: check this flag when setting up the grid
+		this.semanticcolor = io.env.semanticcolor;
 		this.elem = elem
 			.addClass( 'TextGrid' )
 			.on( 'stream', function( e )
 			{
 				self.stream( e.order.data );
 				return false;
-			})
-			.css( 'bgcolor', 'inherit' );
+			});
+		if (!this.semanticcolor)
+			this.elem.css( 'bgcolor', 'inherit' )
 		this.lineheight = io.env.charheight;
 		this.io = io;
 		io.TextInput.statuswin = this.elem;
@@ -90,7 +93,7 @@ var TextGrid = Object.subClass({
 						temp.css({
 							top: $window.scrollTop() + this.lineheight * order.lines,
 							// Account for .main's added 1px padding
-							left: temp.offset().left - 1
+							left: (this.io.env.scrollparent ? 0 : temp.offset().left - 1)
 						});
 						// Fill it with the lines we'll be removing
 						this.write( temp, lines.slice( order.lines ), styles.slice( order.lines ) );
@@ -139,19 +142,27 @@ var TextGrid = Object.subClass({
 			if ( code == 'stream' )
 			{
 				// Calculate the style attribute for this set of text
-				styleelem = $( '<tt>' )
-					.appendTo( elem )
-					.css( order.css || {} );
-				if ( order.css && order.css.reverse )
-				{
-					do_reverse( styleelem );
+				// ZARF: add a simpler way
+				if (!this.semanticcolor) {
+					styleelem = $( '<tt>' )
+						.appendTo( elem )
+						.css( order.css || {} );
+					if ( order.css && order.css.reverse )
+					{
+						do_reverse( styleelem );
+					}
+					stylecode = styleelem.attr( 'style' );
+					if ( stylecode )
+					{
+						stylecode = ' style="' + stylecode + '"';
+					}
 				}
-				stylecode = styleelem.attr( 'style' );
-				if ( stylecode )
-				{
-					stylecode = ' style="' + stylecode + '"';
+				else {
+					stylecode = undefined;
+					if ( order.css && order.css.reverse )
+						stylecode = ' class="Reverse"';
 				}
-				
+
 				// Add the text to the arrays
 				text = order.text;
 				j = 0;
