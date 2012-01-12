@@ -142,29 +142,29 @@ var TextGrid = Object.subClass({
 			{
 				// ZARF: add a simpler way
 				if (!this.semanticcolor) {
-				// Add a row(s) if needed
-				while ( row >= lines.length )
-				{
-					this.addline();
-				}
-				
-				// Calculate the style attribute for this set of text
-				stylecode = undefined;
-				if ( order.css )
-				{
-					styleelem = $( '<tt>' )
-						.appendTo( elem )
-						.css( order.css );
-					if ( order.css.reverse )
+					// Add a row(s) if needed
+					while ( row >= lines.length )
 					{
-						do_reverse( styleelem );
+						this.addline();
 					}
-					stylecode = styleelem.attr( 'style' );
-					if ( stylecode )
+					
+					// Calculate the style attribute for this set of text
+					stylecode = undefined;
+					if ( order.css )
 					{
-						stylecode = ' style="' + stylecode + '"';
+						styleelem = $( '<tt>' )
+							.appendTo( elem )
+							.css( order.css );
+						if ( order.css.reverse )
+						{
+							do_reverse( styleelem );
+						}
+						stylecode = styleelem.attr( 'style' );
+						if ( stylecode )
+						{
+							stylecode = ' style="' + stylecode + '"';
+						}
 					}
-				}
 				}
 				else {
 					stylecode = undefined;
