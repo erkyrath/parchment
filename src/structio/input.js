@@ -187,6 +187,8 @@ TextInput = Object.subClass({
 			// Minus one further line
 			- bodylineheight
 		);
+		// ZARF: The parchment div can scroll horizontally a little.
+		// I don't know why, but I can't fix it, so I'll patch it.
 		this.scrollParent.scrollLeft(0);
 	},
 	
