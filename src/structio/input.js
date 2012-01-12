@@ -176,14 +176,18 @@ TextInput = Object.subClass({
 	// Scroll to the beginning of the last set of output
 	scroll: function()
 	{
+		// ZARF: I'm using lastinput.position() instead of
+		// lastinput.offset().top. This means that .main must
+		// have "position: relative;"
 		this.scrollParent.scrollTop(
 			// The last input relative to the top of the document
-			this.lastinput.offset().top
+			this.lastinput.position().top
 			// Minus the height of the top window
 			- this.statuswin.height()
 			// Minus one further line
 			- bodylineheight
 		);
+		this.scrollParent.scrollLeft(0);
 	},
 	
 	// Get some input

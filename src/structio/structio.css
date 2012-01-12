@@ -49,6 +49,7 @@ http://code.google.com/p/parchment
 {
 	/* Extra padding in case some serifs stick outside the status window */
 	padding: 0 1px;
+	position: relative;
 }
 
 /* Monospace text */
