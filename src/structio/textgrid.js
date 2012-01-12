@@ -140,14 +140,14 @@ var TextGrid = Object.subClass({
 			// Add text to the grid
 			if ( code == 'stream' )
 			{
+				// Add a row(s) if needed
+				while ( row >= lines.length )
+				{
+					this.addline();
+				}
+					
 				// ZARF: add a simpler way
 				if (!this.semanticcolor) {
-					// Add a row(s) if needed
-					while ( row >= lines.length )
-					{
-						this.addline();
-					}
-					
 					// Calculate the style attribute for this set of text
 					stylecode = undefined;
 					if ( order.css )
