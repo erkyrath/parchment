@@ -144,18 +144,18 @@ var TextGrid = Object.subClass({
 				// Calculate the style attribute for this set of text
 				// ZARF: add a simpler way
 				if (!this.semanticcolor) {
-					styleelem = $( '<tt>' )
-						.appendTo( elem )
-						.css( order.css || {} );
-					if ( order.css && order.css.reverse )
-					{
-						do_reverse( styleelem );
-					}
-					stylecode = styleelem.attr( 'style' );
-					if ( stylecode )
-					{
-						stylecode = ' style="' + stylecode + '"';
-					}
+				styleelem = $( '<tt>' )
+					.appendTo( elem )
+					.css( order.css || {} );
+				if ( order.css && order.css.reverse )
+				{
+					do_reverse( styleelem );
+				}
+				stylecode = styleelem.attr( 'style' );
+				if ( stylecode )
+				{
+					stylecode = ' style="' + stylecode + '"';
+				}
 				}
 				else {
 					stylecode = undefined;
