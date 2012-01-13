@@ -38,6 +38,7 @@ var TextGrid = Object.subClass({
 		this.lines = [];
 		this.styles = [];
 		this.lineswanted = 0;
+		this.linesseen = 0;
 		this.linedivs = [];
 		this.cursor = [0, 0]; // row, col
 	},
@@ -66,7 +67,6 @@ var TextGrid = Object.subClass({
 			// Adjust the height of the grid
 			if ( code == 'height' )
 			{
-				console.log('### height change from ' + lines.length + ', now ' + order.lines)
 				this.lineswanted = order.lines;
 				// Increase the height
 				while ( order.lines > lines.length )
@@ -272,14 +272,25 @@ var TextGrid = Object.subClass({
 		var result = '',
 		i = 0, j,
 		text,
-		linediv,
 		style;
 
-		console.log('### input time: lines ' + lines.length + ', wanted ' + this.lineswanted + ', divs ' + this.linedivs.length);
+        if (this.lines.length == this.linesseen && this.lineswanted < this.linedivs.length) {
+            for (var ix=this.lineswanted; ix<this.linedivs.length; ix++) {
+                this.linedivs[ix].remove();
+            }
+            this.linedivs.length = this.lineswanted;
 
+            if (this.lines.length > this.lineswanted) {
+                this.lines.length = this.lineswanted;
+                this.styles.length = this.lineswanted;
+            }
+        }
+
+        // Any linedivs hanging over the current lines length must be
+        // last turn's quotebox. Politely fade them out (and remove from
+        // linedivs).
 		if (lines.length < this.linedivs.length)
 		{
-			console.log('### cutting ' + (this.linedivs.length - lines.length) + ' adrift' );
 			var fade_and_remove = function(el) {
 				el.fadeOut(400, function() { el.remove(); });
 			};
@@ -289,7 +300,10 @@ var TextGrid = Object.subClass({
 			this.linedivs.length = lines.length;
 		}
 		
-		// Go through the lines and styles array, constructing a <tt> whenever the styles change
+		// Go through the lines and styles array, constructing a <tt>
+        // whenever the styles change. Unlike the write() method above,
+        // we make a separate div for each line. (This allows us to delete
+        // and fade specific lines.)
 		while ( i < lines.length )
 		{
 			result = '';
@@ -313,7 +327,7 @@ var TextGrid = Object.subClass({
 				this.linedivs[i].html(result);
 			}
 			else {
-				linediv = $( '<div>' ).html(result);
+				var linediv = $( '<div>' ).html(result);
 				elem.append(linediv);
 				this.linedivs[i] = linediv;
 			}
@@ -321,10 +335,12 @@ var TextGrid = Object.subClass({
 			i++;
 		}
 
+        // Now we can drop the text of lines beyond the VM's window height.
 		if (this.lines.length > this.lineswanted) {
 			this.lines.length = this.lineswanted;
 			this.styles.length = this.lineswanted;
 		}
+        this.linesseen = this.lineswanted;
 	},
 	
 	// Add a blank line
