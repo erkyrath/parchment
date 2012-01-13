@@ -37,6 +37,8 @@ var TextGrid = Object.subClass({
 		io.TextInput.statuswin = this.elem;
 		this.lines = [];
 		this.styles = [];
+		this.lineswanted = 0;
+		this.linedivs = [];
 		this.cursor = [0, 0]; // row, col
 	},
 	
@@ -64,6 +66,8 @@ var TextGrid = Object.subClass({
 			// Adjust the height of the grid
 			if ( code == 'height' )
 			{
+				console.log('### height change from ' + lines.length + ', now ' + order.lines)
+				this.lineswanted = order.lines;
 				// Increase the height
 				while ( order.lines > lines.length )
 				{
@@ -71,7 +75,9 @@ var TextGrid = Object.subClass({
 				}
 				
 				// Decrease the height, and handle box quotations
-				if ( order.lines < lines.length )
+				// ZARF: in oldstylebox mode, we do not decrease lines.length
+				// at this time. It only increases.
+				if ( order.lines < lines.length && !env.oldstylebox )
 				{
 					if ( order.lines != 0 )
 					{
@@ -125,7 +131,7 @@ var TextGrid = Object.subClass({
 				col = order.to[1];
 				
 				// Add a row(s) if needed
-				while ( row >= lines.length )
+				while ( row >= lines.length && !env.oldstylebox )
 				{
 					this.addline();
 				}
@@ -141,7 +147,7 @@ var TextGrid = Object.subClass({
 			if ( code == 'stream' )
 			{
 				// Add a row(s) if needed
-				while ( row >= lines.length )
+				while ( row >= lines.length && !env.oldstylebox )
 				{
 					this.addline();
 				}
@@ -179,7 +185,7 @@ var TextGrid = Object.subClass({
 				{
 					temp = text.charAt( j++ );
 					// Regular character
-					if ( temp != '\n' )
+					if ( temp != '\n' && row < lines.length)
 					{
 						lines[row][col] = temp;
 						styles[row][col++] = stylecode;
@@ -191,7 +197,7 @@ var TextGrid = Object.subClass({
 						col = 0;
 						
 						// Add a row if needed
-						if ( row >= lines.length )
+						if ( row >= lines.length && !env.oldstylebox )
 						{
 							this.addline();
 						}
@@ -213,7 +219,10 @@ var TextGrid = Object.subClass({
 		this.cursor = [row, col];
 		
 		// Update the HTML
-		this.write( elem, lines, styles );
+		if (!env.oldstylebox)
+			this.write( elem, lines, styles );
+		else
+			this.writeoldstyle( elem, lines, styles );
 		
 		// Try to adjust the main window's padding - for now guess what the window's class is
 		if ( lines.length != oldheight )
@@ -230,7 +239,7 @@ var TextGrid = Object.subClass({
 		i = 0, j,
 		text,
 		style;
-		
+
 		// Go through the lines and styles array, constructing a <tt> whenever the styles change
 		while ( i < lines.length )
 		{
@@ -256,6 +265,66 @@ var TextGrid = Object.subClass({
 			}
 		}
 		elem.html( result );
+	},
+
+	writeoldstyle: function( elem, lines, styles )
+	{
+		var result = '',
+		i = 0, j,
+		text,
+		linediv,
+		style;
+
+		console.log('### input time: lines ' + lines.length + ', wanted ' + this.lineswanted + ', divs ' + this.linedivs.length);
+
+		if (lines.length < this.linedivs.length)
+		{
+			console.log('### cutting ' + (this.linedivs.length - lines.length) + ' adrift' );
+			var fade_and_remove = function(el) {
+				el.fadeOut(400, function() { el.remove(); });
+			};
+			for (var ix=lines.length; ix<this.linedivs.length; ix++) {
+				fade_and_remove(this.linedivs[ix]);
+			}
+			this.linedivs.length = lines.length;
+		}
+		
+		// Go through the lines and styles array, constructing a <tt> whenever the styles change
+		while ( i < lines.length )
+		{
+			result = '';
+			text = '';
+			style = styles[i][0];
+			for ( j = 0; j < lines[i].length; j++ )
+			{
+				if ( styles[i][j] == style )
+				{
+					text += lines[i][j];
+				}
+				else
+				{
+					result += '<tt' + ( style || '' ) + '>' + text + '</tt>';
+					style = styles[i][j];
+					text = lines[i][j];
+				}
+			}
+			result += '<tt' + ( style || '' ) + '>' + text + '</tt>';
+			if (i < this.linedivs.length) {
+				this.linedivs[i].html(result);
+			}
+			else {
+				linediv = $( '<div>' ).html(result);
+				elem.append(linediv);
+				this.linedivs[i] = linediv;
+			}
+			this.linedivs[i].show();
+			i++;
+		}
+
+		if (this.lines.length > this.lineswanted) {
+			this.lines.length = this.lineswanted;
+			this.styles.length = this.lineswanted;
+		}
 	},
 	
 	// Add a blank line
