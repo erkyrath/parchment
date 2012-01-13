@@ -68,6 +68,7 @@ var TextGrid = Object.subClass({
 			if ( code == 'height' )
 			{
 				this.lineswanted = order.lines;
+				console.log('### height, wanted ' + order.lines + ', cur ' + lines.length);
 				// Increase the height
 				while ( order.lines > lines.length )
 				{
@@ -116,6 +117,7 @@ var TextGrid = Object.subClass({
 			// Empty the grid, but don't change it's size
 			if ( code == 'clear' )
 			{
+				console.log('### clear, cur lines ' + lines.length);
 				j = 0;
 				while ( j < lines.length )
 				{
@@ -129,12 +131,15 @@ var TextGrid = Object.subClass({
 			{
 				row = order.to[0];
 				col = order.to[1];
+				console.log('### cursor to ' + row);
 				
 				// Add a row(s) if needed
-				while ( row >= lines.length && !env.oldstylebox )
+				while ( row >= lines.length )
 				{
 					this.addline();
 				}
+				if (row+1 > this.lineswanted)
+					this.lineswanted = row+1;
 			}
 			
 			if ( code == 'get_cursor' )
@@ -203,6 +208,7 @@ var TextGrid = Object.subClass({
 						}
 					}
 				}
+				console.log('### stream left row at ' + row);
 			}
 			
 			if ( code == 'eraseline' )
@@ -273,22 +279,23 @@ var TextGrid = Object.subClass({
 		i = 0, j,
 		text,
 		style;
+		console.log('### input time: lines ' + lines.length + ', wanted ' + this.lineswanted + ', divs ' + this.linedivs.length);
 
-        if (this.lines.length == this.linesseen && this.lineswanted < this.linedivs.length) {
-            for (var ix=this.lineswanted; ix<this.linedivs.length; ix++) {
-                this.linedivs[ix].remove();
-            }
-            this.linedivs.length = this.lineswanted;
+		if (this.lines.length == this.linesseen && this.lineswanted < this.linedivs.length) {
+			for (var ix=this.lineswanted; ix<this.linedivs.length; ix++) {
+				this.linedivs[ix].remove();
+			}
+			this.linedivs.length = this.lineswanted;
 
-            if (this.lines.length > this.lineswanted) {
-                this.lines.length = this.lineswanted;
-                this.styles.length = this.lineswanted;
-            }
-        }
+			if (this.lines.length > this.lineswanted) {
+				this.lines.length = this.lineswanted;
+				this.styles.length = this.lineswanted;
+			}
+		}
 
-        // Any linedivs hanging over the current lines length must be
-        // last turn's quotebox. Politely fade them out (and remove from
-        // linedivs).
+		// Any linedivs hanging over the current lines length must be
+		// last turn's quotebox. Politely fade them out (and remove from
+		// linedivs).
 		if (lines.length < this.linedivs.length)
 		{
 			var fade_and_remove = function(el) {
@@ -301,9 +308,9 @@ var TextGrid = Object.subClass({
 		}
 		
 		// Go through the lines and styles array, constructing a <tt>
-        // whenever the styles change. Unlike the write() method above,
-        // we make a separate div for each line. (This allows us to delete
-        // and fade specific lines.)
+		// whenever the styles change. Unlike the write() method above,
+		// we make a separate div for each line. (This allows us to delete
+		// and fade specific lines.)
 		while ( i < lines.length )
 		{
 			result = '';
@@ -335,12 +342,13 @@ var TextGrid = Object.subClass({
 			i++;
 		}
 
-        // Now we can drop the text of lines beyond the VM's window height.
+		// Now we can drop the text of lines beyond the VM's window height.
 		if (this.lines.length > this.lineswanted) {
 			this.lines.length = this.lineswanted;
 			this.styles.length = this.lineswanted;
 		}
-        this.linesseen = this.lineswanted;
+		this.linesseen = this.lineswanted;
+		console.log('### ... after: lines ' + lines.length + ', wanted ' + this.lineswanted + ', divs ' + this.linedivs.length);
 	},
 	
 	// Add a blank line
