@@ -67,7 +67,6 @@ var TextGrid = Object.subClass({
 			// Adjust the height of the grid
 			if ( code == 'height' )
 			{
-				console.log('### height, wanted ' + order.lines + ', cur ' + lines.length);
 				// Clear lines from the old height to the new height
 				j = this.lineswanted;
 				while ( j < lines.length )
@@ -124,7 +123,6 @@ var TextGrid = Object.subClass({
 			// Empty the grid, but don't change it's size
 			if ( code == 'clear' )
 			{
-				console.log('### clear, cur lines ' + lines.length);
 				j = 0;
 				while ( j < lines.length )
 				{
@@ -138,7 +136,6 @@ var TextGrid = Object.subClass({
 			{
 				row = order.to[0];
 				col = order.to[1];
-				console.log('### cursor to ' + row);
 				
 				// Add a row(s) if needed
 				while ( row >= lines.length )
@@ -215,7 +212,6 @@ var TextGrid = Object.subClass({
 						}
 					}
 				}
-				console.log('### stream left row at ' + row);
 			}
 			
 			if ( code == 'eraseline' )
@@ -286,7 +282,6 @@ var TextGrid = Object.subClass({
 		i = 0, j,
 		text,
 		style;
-		console.log('### input time: lines ' + lines.length + ', wanted ' + this.lineswanted + ', divs ' + this.linedivs.length);
 
 		if (this.lines.length == this.linesseen && this.lineswanted < this.linedivs.length) {
 			for (var ix=this.lineswanted; ix<this.linedivs.length; ix++) {
@@ -355,7 +350,6 @@ var TextGrid = Object.subClass({
 			this.styles.length = this.lineswanted;
 		}
 		this.linesseen = this.lineswanted;
-		console.log('### ... after: lines ' + lines.length + ', wanted ' + this.lineswanted + ', divs ' + this.linedivs.length);
 	},
 	
 	// Add a blank line
