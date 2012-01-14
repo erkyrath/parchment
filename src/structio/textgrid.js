@@ -67,13 +67,20 @@ var TextGrid = Object.subClass({
 			// Adjust the height of the grid
 			if ( code == 'height' )
 			{
-				this.lineswanted = order.lines;
 				console.log('### height, wanted ' + order.lines + ', cur ' + lines.length);
+				// Clear lines from the old height to the new height
+				j = this.lineswanted;
+				while ( j < lines.length )
+				{
+					this.addline( j++ );
+				}
 				// Increase the height
 				while ( order.lines > lines.length )
 				{
 					this.addline();
 				}
+				// Set the new height (the VM's notion of it)
+				this.lineswanted = order.lines;
 				
 				// Decrease the height, and handle box quotations
 				// ZARF: in oldstylebox mode, we do not decrease lines.length
