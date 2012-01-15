@@ -156,9 +156,19 @@ StructIO = Object.subClass({
 				temp.empty();
 				// Set the background colour
 				// If we're clearing the main window, then change <body> instead
+				// ZARF: ... or the colorparent, or the scrollparent, if appropriate
 				if ( order.css && order.css['background-color'] )
 				{
-					( order.name == 'main' ? $body : temp ).css( 'background-color', order.css['background-color'] );
+					if (order.name == 'main')
+					{
+						if (this.env.colorparent)
+							temp = $(this.env.colorparent);
+						else if (this.env.scrollparent)
+							temp = $(this.env.scrollparent);
+						else
+							temp = $body;
+					}
+					temp.css( 'background-color', order.css['background-color'] );
 				}
 			}
 			
