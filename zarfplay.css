@@ -50,6 +50,12 @@ body {
   line-height: 12pt;
 }
 
+.Fixed {
+  font-family: monaco, andale mono, lucidatypewriter, courier, courier new, monospace;
+  font-size: 10pt;
+  line-height: 12pt;
+}
+
 .Reverse {
   color: white;
   background-color: #444;

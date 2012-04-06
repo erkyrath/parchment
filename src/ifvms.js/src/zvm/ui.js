@@ -155,7 +155,9 @@ return Object.subClass({
 			};
 			if ( this.mono )
 			{
-				order.node = 'tt';
+				// ZARF: I don't like relying on <tt> here
+				order.node = 'tt'; 
+				order.name = 'Fixed';
 			}
 			( this.currentwin ? this.status : this.e.orders ).push( order );
 			this.buffer = '';
