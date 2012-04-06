@@ -26,6 +26,11 @@ var space_replacer = function( spaces )
 	return '\n' + Array( spaces.length ).join( '&ensp;' );
 },
 
+space_replacer_2 = function( spaces )
+{
+	return Array( spaces.length ).join( '\u00A0' ) + ' ';
+},
+
 // Root stream handler. Some structures (like text grids) could have alternative handlers
 basic_stream_handler = function( e )
 {
@@ -48,8 +53,19 @@ basic_stream_handler = function( e )
 	{
 		// Fix initial spaces, but not for tt (which will actually mess it up)
 		// For tt's, fix all spaces so that they will still wrap
-		text = node == 'tt' ? text.replace( /( +)/g, '<span class="space">$1</span>' ) : text.replace( /\n +(?=\S)/g, space_replacer );
-		elem.html( text.replace( /\n/g, '<br>' ) );
+		//text = node == 'tt' ? text.replace( /( +)/g, '<span class="space">$1</span>' ) : text.replace( /\n +(?=\S)/g, space_replacer );
+		// ZARF: Do this in a cleaner way.
+		text = text.replace( /( +) /g, space_replacer_2 );
+		text = text.replace( /^ /mg, '\u00A0');
+		// elem.html( text.replace( /\n/g, '<br>' ) );
+		// ZARF: also insert <br> tags in a cleaner way.
+		var subls = text.split("\n");
+		for (var ix=0; ix<subls.length; ix++) {
+			if (ix != 0)
+				elem.append($('<br>'));
+			if (subls[ix].length)
+				elem.append(document.createTextNode(subls[ix]));
+		}
 	}
 	
 	// If we have a custom function to run, do so
