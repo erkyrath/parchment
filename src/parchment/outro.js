@@ -19,17 +19,17 @@ $(function()
 
    Therefore, this code goes into a function: parchment.load_library().
 */
-function load_library(game_options) 
+function load_library(parchment_options) 
 {
 	var library;
 	
 	// Check for any customised options
-        if ( !game_options )
-            game_options = window.game_options;
+        if ( !parchment_options )
+            parchment_options = window.parchment_options;
 
-	if ( game_options )
+	if ( parchment_options )
 	{
-		$.extend( parchment.options, game_options );
+		$.extend( parchment.options, parchment_options );
 	}
 	
 	// Load additional options from the query string
