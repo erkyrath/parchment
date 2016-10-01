@@ -12,12 +12,24 @@ http://code.google.com/p/parchment
 // Load Parchment, start it all up!
 $(function()
 {
+
+/* Unlike in regular Parchment, this code is not executed at page-ready
+   time. Instead, we must wait for the Lectrote process to hand us a game
+   file to load. 
+
+   Therefore, this code goes into a function: parchment.load_library().
+*/
+function load_library(game_options) 
+{
 	var library;
 	
 	// Check for any customised options
-	if ( window.parchment_options )
+        if ( !game_options )
+            game_options = window.game_options;
+
+	if ( game_options )
 	{
-		$.extend( parchment.options, parchment_options );
+		$.extend( parchment.options, game_options );
 	}
 	
 	// Load additional options from the query string
@@ -36,12 +48,10 @@ $(function()
 	library = new parchment.lib.Library();
 	parchment.library = library;
 	library.load();
+}
 
-	// Add the Analytics tracker, but only if we're at iplayif.com
-	if ( location.href.indexOf( 'iplayif.com' ) != -1 )
-	{
-		$.getScript( 'http://google-analytics.com/ga.js', function(){_gat._getTracker( 'UA-7949545-3' )._trackPageview();} );
-	}
+parchment.load_library = load_library;
+
 });
 
 })( this, jQuery );
