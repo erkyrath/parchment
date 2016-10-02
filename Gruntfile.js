@@ -33,6 +33,25 @@ module.exports = function( grunt )
 						'src/parchment/outro.js',
 						'src/parchment/quixe-runner.js',
 					],
+					'lib/parchment-bare.debug.js': [
+						'src/parchment/header.txt',
+						'src/lib/class.js',
+						'src/lib/iff.js',
+						'src/structio/intro.js',
+						'src/structio/input.js',
+						'src/structio/textgrid.js',
+						'src/structio/api.js',
+						'src/structio/outro.js',
+						'src/structio/runner.js',
+						'src/parchment/error-handling.js',
+						'src/parchment/file.js',
+						'src/parchment/ui.js',
+						'src/parchment/library.js',
+						'src/parchment/quixe.js',
+						'src/parchment/ifvms.js',
+						'src/parchment/gnusto.js',
+						'src/parchment/quixe-runner.js',
+					],
 					'lib/parchment.debug.css': [
 						'src/parchment/header.txt',
 						'src/parchment/parchment.css',
@@ -131,6 +150,7 @@ module.exports = function( grunt )
 			parchment: {
 				files: {
 					'lib/parchment.min.js': [ 'lib/parchment.debug.js' ],
+					'lib/parchment-bare.min.js': [ 'lib/parchment-bare.debug.js' ],
 					'lib/gnusto.min.js': [ 'lib/gnusto.debug.js' ],
 				},
 			},
