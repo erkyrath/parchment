@@ -258,9 +258,9 @@ Library = Object.subClass({
 			storyfile = [ storyfile, 0 ];
 		}
 
-                // If the storyfile is a very long array, we assume it's
-                // an already-loaded game file (rather than the URL of one).
-                if (storyfile[0].length > 16) {
+                // If the storyfile is an array, we assume it's an
+                // already-loaded game file (rather than the URL of one).
+                if ($.isArray(storyfile[0])) {
                     var arg = { vm:parchment.vms['zvm'], library:self, responseArray:storyfile[0] };
                     launch_callback([ null, null, arg ]);
                     return;
